@@ -37,7 +37,7 @@ Telegram::Bot::Client.run(token) do |bot|
     # Section 2 Check Status
     when "#{@sec2}"
       @current = 2
-      question = @sec2
+      question = @sec2_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
@@ -52,17 +52,17 @@ Telegram::Bot::Client.run(token) do |bot|
         .new(keyboard: @kb_sec3, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
     
-    when "#{@item_3_1}"
+    when "#{@4levels}"
       @length = 'long'
-      question = @item_3_1_text
+      question = "You have selected #{@length} volunteering. \nPlease, choose how many hours you want to volunteer"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_sec4, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
-    when "#{@item_3_2}"
+    when "#{@3levels}"
       @length = 'short'
-      question = @item_3_2_text
+      question = "you have selected #{@length} volunteering \n please, choose how many hours you want to volunteer"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_sec4, one_time_keyboard: true)
@@ -92,49 +92,26 @@ Telegram::Bot::Client.run(token) do |bot|
         .new(keyboard: @kb_sec5, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
-    # Section 5
-    when "#{@sec5}"
-      @current = 5
-      question = @instruction
-      answers =
-        Telegram::Bot::Types::ReplyKeyboardMarkup
-        .new(keyboard: @kb_sec5, one_time_keyboard: true)
-      bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
+    # Section 5 Confirmation
     
     when "#{@item_5_1}"
       question = @item_5_1_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
-        .new(keyboard: @kb_answer, one_time_keyboard: true)
+        .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
     when "#{@item_5_2}"
       question = @item_5_2_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
-        .new(keyboard: @kb_answer, one_time_keyboard: true)
+        .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
-    #Section 6
-    when "#{@sec6}" 
+    # Section 6
+    when "#{@sec6}"
       @current = 6
-      question = @instruction
-      answers =
-        Telegram::Bot::Types::ReplyKeyboardMarkup
-        .new(keyboard: @kb_sec6, one_time_keyboard: true)
-      bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
-    
-    when "#{@item_6_1}"
-      question = @item_6_1_text
-      answers =
-        Telegram::Bot::Types::ReplyKeyboardMarkup
-        .new(keyboard: @kb_answer, one_time_keyboard: true)
-      bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
-
-    # Section 7
-    when "#{@sec7}"
-      @current = 7
-      question = @instruction
+      question = @sec6_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)

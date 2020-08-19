@@ -4,8 +4,8 @@
 # The values for each section go here, keep the quotation marks
 
   # Section 0
-  @greeting = "Hello, "
-  @instruction = 'please, choose an option'
+  @greeting = "Hello "
+  @instruction = '! Please, choose an option'
   @goodbye = 'Goodbye,'
   @restart = "To restart the Bot please type /start"
   @current = 0
@@ -34,12 +34,9 @@
 
   # Section 3 @items
 
-  @item_3_1 = 'Volunteer Long'
-  @item_3_1_text = 'You have selected long volunteering'
+  @4levels = 'Long, 4 levels'
 
-  @item_3_2 = 'Volunteer Short'
-  @item_3_2_text = 'you have selected short volunteering'
-
+  @3levels = 'Short, 3 levels'
 
   # Section 4 - Volunteering Amount
   @sec4 = 'Volunteering Amount'
@@ -64,30 +61,17 @@
   # Section 5 @items
 
   @item_5_1 = 'Confirm'
-  @item_5_1_text = 'Confirm'
+  @item_5_1_text = 'Instructions to send proof of hours commitment go here'
 
   @item_5_2 = 'Cancel'
   @item_5_2_text = 'Volunteering has been cancelled'
 
-    # Section 6 - Proof of Payment
-    @sec6 = 'Send proof of payment'
+  # Section 6 - Help
+  @sec6 = 'Help'
 
-    # Section 6 text
-    @sec_6_text = 'Please, send a screenshot of your payment'
+  # Section 6 text
+  @sec6_text = 'Instructions to get help'
   
-    # Section 6 @items
-  
-    @item_6_1 = 'Send proof of payment'
-    @item_6_1_text = 'Thank you for sending your proof of payment, it will be reviewed and you will be notified once it has been approved'
-
-
-  # Section 7 - Help
-  @sec7 = 'Help'
-
-  # Section 7 text
-  @sec_7_text = 'An administrator will get in touch soon'
-  
-
   # Keyboard Variables
   @home = 'Home'
   @return = 'Back'
@@ -99,33 +83,20 @@
     [@sec1],
     [@sec2], 
     [@sec3],
-    [@sec7]
+    [@sec6]
   ]
-
-  @kb_answer = [@home, @return, @end]
-
 
   @kb_sec3 = [
     [@item_3_1],
-    [@item_3_2],
-    [@home, @end]
+    [@item_3_2]
   ]
 
   @kb_sec4 = [
     [@item_4_1],
-    [@item_4_2],
-    [@home, @end]
+    [@item_4_2]
   ]
 
   @kb_sec5 = [
     [@item_5_1],
     [@item_5_2],
-  ]
-
-  @kb_sec6 = [
-    [@item_6_1]
-  ]
-
-  @kb_sec7 = [
-    [@home, @end]
   ]
