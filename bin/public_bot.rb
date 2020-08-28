@@ -1,8 +1,8 @@
 require 'telegram/bot'
 require_relative('./values.rb')
-# require_relative('./lib/bots_controller.rb')
+require_relative('./lib/bots_controller.rb')
 
-token = @tkn
+token = @tkn_public
 puts @launch
 
 Telegram::Bot::Client.run(token) do |bot|
@@ -37,7 +37,7 @@ Telegram::Bot::Client.run(token) do |bot|
     # Section 2 Check Status
     when "#{@sec2}"
       @current = 2
-      question = @sec2_text
+      question = "Your ID is #{message.from.id}\n #{@sec2_text}"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
