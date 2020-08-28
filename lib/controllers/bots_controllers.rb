@@ -29,7 +29,7 @@ def match_check_long_level(str)
 end
 
 # returns a boolean value based on wether the input matches de format "check type short level" as in "check type short 3"
-def match_check_long_level(str)
+def match_check_short_level(str)
   !!(str =~ /check\stype\sshort\s(1|2|3)/)
 end
 
@@ -39,7 +39,7 @@ def match_pending(str)
 end
 
 # returns a boolean value based on wether the input matches de format "check closed"
-def match_pending(str)
+def match_closed(str)
   !!(str =~ /check\sclosed/)
 end
 
