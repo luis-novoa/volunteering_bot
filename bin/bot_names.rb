@@ -9,14 +9,14 @@ Telegram::Bot::Client.run(token) do |bot|
     when '/start'
       bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
 
-    when /activate\s\d{10}\s\d{1,3}/
+    when /activate\s\d{9}\s\d{1,3}/
       # Activates a pending instance for an user and gives a confirmation message 
       usr_id = splitter(message.from.id)[1]
       usr_instance = splitter(message.from.id)[2]
 
       bot.api.send_message(chat_id: message.chat.id, text: "output goes here")
 
-    when /delete\s\d{10}\s\d{1,3}/
+    when /delete\s\d{9}\s\d{1,3}/
       # Deletes a pending instance for an user and gives a confirmation message 
       usr_id = splitter(message.from.id)[1]
       usr_instance = splitter(message.from.id)[2]
@@ -27,7 +27,7 @@ Telegram::Bot::Client.run(token) do |bot|
       # Shows all the instances for all the users
       bot.api.send_message(chat_id: message.chat.id, text: "output goes here")
 
-    when /check\suser\s\d{10}/
+    when /check\suser\s\d{9}/
       # Shows all the instances for a specific user
       user_id = splitter(message.from.id)[2]
 

@@ -1,11 +1,11 @@
 # returns a boolean value based on wether the input matches de format "command id instance" as in "activate 1234567890 123"
 def match_activate(str)
-  !!(str =~ /activate\s\d{10}\s\d{1,3}/)
+  !!(str =~ /activate\s\d{9}\s\d{1,3}/)
 end
 
 # returns a boolean value based on wether the input matches de format "command id instance" as in "delete 1234567890 123"
 def match_delete(str)
-  !!(str =~ /delete\s\d{10}\s\d{1,3}/)
+  !!(str =~ /delete\s\d{9}\s\d{1,3}/)
 end
 
 # returns a boolean value based on wether the input matches de format "check all" 
@@ -15,7 +15,7 @@ end
 
 # returns a boolean value based on wether the input matches de format "check user id" as in "cher user 1234567890" 
 def match_check_user(str)
-  !!(str =~ /check\suser\s\d{10}/)
+  !!(str =~ /check\suser\s\d{9}/)
 end
 
 # returns a boolean value based on wether the input matches de format "check type long/short" as in "check type long"
