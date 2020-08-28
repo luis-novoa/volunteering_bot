@@ -3,6 +3,11 @@ def match_activate(str)
   !!(str =~ /activate\s\d{10}\s\d{1,3}/)
 end
 
+# returns a boolean value based on wether the input matches de format "command id instance" as in "delete 1234567890 123"
+def match_delete(str)
+  !!(str =~ /delete\s\d{10}\s\d{1,3}/)
+end
+
 # returns a boolean value based on wether the input matches de format "check all" 
 def match_check_all(str)
   !!(str =~ /check\sall/)

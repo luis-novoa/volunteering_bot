@@ -1,16 +1,16 @@
 require 'telegram/bot'
 require_relative('./values.rb')
-require_relative('./lib/bots_controller.rb')
+#require_relative('./lib/bots_controller.rb')
 
 token = @tkn_public
 puts @launch
 
 Telegram::Bot::Client.run(token) do |bot|
   bot.listen do |message|
+    @identity = message.from.id
     case message.text
     # Starts the boot and says hello to the user
     when '/start'
-      @current = 0
       question = "#{@greeting} #{message.from.first_name} #{@instruction}"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -18,7 +18,6 @@ Telegram::Bot::Client.run(token) do |bot|
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
     when "#{@home}"
-      @current = 0
       question = "#{@greeting} #{message.from.first_name} #{@instruction}"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -27,7 +26,6 @@ Telegram::Bot::Client.run(token) do |bot|
     
     # Section 1 Rules
     when "#{@sec1}"
-      @current = 1
       question = @sec1_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -36,8 +34,9 @@ Telegram::Bot::Client.run(token) do |bot|
 
     # Section 2 Check Status
     when "#{@sec2}"
-      @current = 2
-      question = "Your ID is #{message.from.id}\n #{@sec2_text}"
+      #Here is where the output goes here, and it should show all the instances for the user, both active and pending. if you want I can create a method to format the output nicely.
+      # you can find the user id in @identity
+      question = "Your ID is #{message.from.id}\n#{@sec2_text}"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
@@ -45,14 +44,13 @@ Telegram::Bot::Client.run(token) do |bot|
     
     # Section 3 Volunteering
     when "#{@sec3}"
-      @current = 3
       question = @sec3_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_sec3, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
     
-    when "#{@4levels}"
+    when "#{@item_3_1}"
       @length = 'long'
       question = "You have selected #{@length} volunteering. \nPlease, choose how many hours you want to volunteer"
       answers =
@@ -60,9 +58,9 @@ Telegram::Bot::Client.run(token) do |bot|
         .new(keyboard: @kb_sec4, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
-    when "#{@3levels}"
+    when "#{@item_3_2}"
       @length = 'short'
-      question = "you have selected #{@length} volunteering \n please, choose how many hours you want to volunteer"
+      question = "you have selected #{@length} volunteering \nPlease, choose how many hours you want to volunteer"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_sec4, one_time_keyboard: true)
@@ -100,6 +98,9 @@ Telegram::Bot::Client.run(token) do |bot|
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
+      # Here we have the type of board stored in the variable @length and the amount in @size
+      # It should be able to create a new instance for that user based on those two parameters
+      # aditionally, the user's unique id is found in @identity
 
     when "#{@item_5_2}"
       question = @item_5_2_text
@@ -110,7 +111,6 @@ Telegram::Bot::Client.run(token) do |bot|
 
     # Section 6
     when "#{@sec6}"
-      @current = 6
       question = @sec6_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -119,7 +119,6 @@ Telegram::Bot::Client.run(token) do |bot|
 
     # Stops the Bot and says goodbye
     when "#{@end}"
-      @current = 0
       kb = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: "#{@goodbye} #{message.from.first_name} \n #{@restart}", reply_markup: kb)
     end

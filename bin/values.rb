@@ -34,9 +34,9 @@
 
   # Section 3 @items
 
-  @4levels = 'Long, 4 levels'
+  @item_3_1 = 'Long, 4 levels'
 
-  @3levels = 'Short, 3 levels'
+  @item_3_2 = 'Short, 3 levels'
 
   # Section 4 - Volunteering Amount
   @sec4 = 'Volunteering Amount'
