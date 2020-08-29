@@ -1,6 +1,7 @@
 # The Telegram bot's token goes here, replace 'token' for your token, keep the quotation marks as in 'your-token-goes-here'
 @tkn_public = '877177203:AAE5tNPbYDt62BTzlWxG02FzYhe6uqQHu88'
-@tkn_admin = ''
+@tkn_admin = '1118059983:AAHGhd2BhPa78F_zaw0BbSrWceBqVHfILPE'
+@admin_id = '748866554'
 # The values for each section go here, keep the quotation marks
 
   # Section 0
@@ -18,7 +19,6 @@
 
   # Section 1 text
   @sec1_text = 'Explanation of Rules goes here'
-
 
   # Section 2 - Check Status
   @sec2 = 'Check Status'

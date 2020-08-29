@@ -1,6 +1,6 @@
 require 'telegram/bot'
 require_relative('./values.rb')
-#require_relative('./lib/bots_controller.rb')
+require_relative('../lib/controllers/bots_controllers.rb')
 
 token = @tkn_public
 puts @launch
