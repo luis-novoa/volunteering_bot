@@ -69,7 +69,7 @@ Telegram::Bot::Client.run(token) do |bot|
         bot.api.send_message(chat_id: message.chat.id, text: "I'm sorry, #{message.from.first_name}. I don't understand.")
       end
     else
-      bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name} your id is #{message.from.id} and only #{@admin_id} can use this bot")
+      bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name} you are not currently authorized to use this bot")
     end
   end
 end
