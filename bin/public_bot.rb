@@ -49,7 +49,7 @@ Telegram::Bot::Client.run(token) do |bot|
       else
         text = ""
         user_participations.each do |participation|
-          text += "Participation ID: #{participation.id}, Type: #{participation.dashboard.type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
+          text += "Participation ID: #{participation.id}, Type: #{participation.dashboard.dashboard_type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
       end
@@ -87,7 +87,7 @@ Telegram::Bot::Client.run(token) do |bot|
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
     
     when "#{@item_4_1}"
-      @size = '50'
+      @size = 50
       question = "You have selected #{@length} volunteering for #{@size} hours"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -95,7 +95,7 @@ Telegram::Bot::Client.run(token) do |bot|
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
 
     when "#{@item_4_2}"
-      @size = '100'
+      @size = 100
       question = "You have selected #{@length} volunteering for #{@size} hours"
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
@@ -110,10 +110,10 @@ Telegram::Bot::Client.run(token) do |bot|
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
-      # Here we have the type of board stored in the variable @length and the amount in @size
+      # Here we have the dashboard_type of board stored in the variable @length and the amount in @size
       # It should be able to create a new instance for that user based on those two parameters
       # aditionally, the user's unique id is found in @identity
-      dashboard = Dashboard.find_by(type: @length, entrance_fee: @size)
+      dashboard = Dashboard.find_by(dashboard_type: @length, entrance_fee: @size)
       if dashboard.participations.where(user_id: @identity, active: true).zero?
         participation = dashboard.participations.build(user_id: @identity, level: 1, active: false)
         participation.save
