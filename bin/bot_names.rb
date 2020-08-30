@@ -25,9 +25,18 @@ Telegram::Bot::Client.run(token) do |bot|
           check_level_one(dashboard)
           text += "The instance #{usr_instance} of user #{usr_id} was activated"
         else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. Action aborted."
+          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
+
+      when /close\s\d{9}\s\d{1,3}/
+        # Closes an instance for an user, creates a new lvl 1 active instance for the same kind of board and amount and gives a confirmation message 
+        usr_id = BotControllers.splitter(message.text)[1]
+        usr_instance = BotControllers.splitter(message.text)[2]
+        # This is solely for the purpose of mock interfacing
+        new_instance = usr_instance.to_i + 1
+
+        bot.api.send_message(chat_id: message.chat.id, text: "The instance #{usr_instance} of user #{usr_id} was has been closed and the instance #{new_instance.to_s} has been created")
 
       when /delete\s\d{9}\s\d{1,3}/
         # Deletes a pending instance for an user and gives a confirmation message 
@@ -39,7 +48,7 @@ Telegram::Bot::Client.run(token) do |bot|
           participation.delete
           text += "The instance #{usr_instance} of user #{usr_id} was deleted"
         else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. Action aborted."
+          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
         end
 
         bot.api.send_message(chat_id: message.chat.id, text: text)
@@ -107,7 +116,7 @@ Telegram::Bot::Client.run(token) do |bot|
         bot.api.send_message(chat_id: message.chat.id, text: "I'm sorry, #{message.from.first_name}. I don't understand.")
       end
     else
-      bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name} you are not currently authorized to use this bot")
+      bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name} you are currently not authorized to use this bot")
     end
   end
 end
