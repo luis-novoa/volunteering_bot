@@ -55,58 +55,70 @@ Telegram::Bot::Client.run(token) do |bot|
 
       when /check\sall/
         # Shows all the instances for all the users
-        participations = Participation.all
-        bot.api.send_message(chat_id: message.chat.id, text: "All was checked")
+        participations = Participation.all.includes(:dashboard).order(user_id: :asc)
+        text = ''
+        participations.each do |participation|
+          text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{participation.dashboard.type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
+        end
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\suser\s\d{9}/
         # Shows all the instances for a specific user
         user_id = BotControllers.splitter(message.text)[2]
         participations = Participation.where(user_id: user_id)
-        bot.api.send_message(chat_id: message.chat.id, text: "The user #{usr_id} was checked")
+        text = ''
+        participations.each do |participation|
+          text += "Participation: #{participation.id}, Type: #{participation.dashboard.type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
+        end
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\stype\s(long|short)/
         # Shows all the instances for a type of board, either long or short
         board_type = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(type: board_type).includes(:participations)
-        participations = []
+        text = ''
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            participations << participation
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
           end
         end
-        bot.api.send_message(chat_id: message.chat.id, text: "All #{board_type} boards were checked")
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\slong\s(1|2|3|4)/
         # Shows all the instances of for long boards for a specific level from 1 to 4
         board_type = 'long'
         board_level = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(type: board_type).includes(:participations)
-        participations = []
+        text = ''
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            participations << participation if participation.level == board_level
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n" if participation.level == board_level
           end
         end
-        bot.api.send_message(chat_id: message.chat.id, text: "All users at long boards level #{board_level} were checked")
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\sshort\s(1|2|3)/
         # Shows all the instances of for short boards for a specific level from 1 to 3
         board_type = 'short'
         board_level = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(type: board_type).includes(:participations)
-        participations = []
+        text = ''
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            participations << participation if participation.level == board_level
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n" if participation.level == board_level
           end
         end
-        bot.api.send_message(chat_id: message.chat.id, text: "All users at short board level #{board_level} were checked")
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\spending\s(long|short|all)/
         # Shows all the instances pending to be activated
         board_status = BotControllers.splitter(message.text)[2]
-        participations = Participation.where(active: false)
-        bot.api.send_message(chat_id: message.chat.id, text: "These are all the pending users in #{board_status} boards")
+        participations = Participation.where(active: false).order(user_id: :asc).includes(:dashboard)
+        text = "Pending participations:\n"
+        participations.each do |participation|
+          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}\n"
+        end
+        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\sclosed/
         # Shows all the instances that have been closed
