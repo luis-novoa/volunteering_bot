@@ -49,7 +49,7 @@ Telegram::Bot::Client.run(token) do |bot|
       else
         text = ""
         user_participations.each do |participation|
-          text += "Participation ID: #{participation.id}, Type: #{participation.dashboard.type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}\n"
+          text += "Participation ID: #{participation.id}, Type: #{participation.dashboard.type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
       end
@@ -115,9 +115,9 @@ Telegram::Bot::Client.run(token) do |bot|
       # aditionally, the user's unique id is found in @identity
       dashboard = Dashboard.find_by(type: @length, entrance_fee: @size)
       if dashboard.participations.where(user_id: @identity, active: true).zero?
-        dashboard.participations.build(user_id: @identity, level: 1, active: false)
-        dashboard.save
-        bot.api.send_message(chat_id: message.chat.id, text: "Your participation request was created. Please, pay the fee and notify the administrator.")
+        participation = dashboard.participations.build(user_id: @identity, level: 1, active: false)
+        participation.save
+        bot.api.send_message(chat_id: message.chat.id, text: "Participation request #{participation.id} was created. Please, pay the fee and notify the administrator.")
       else
         bot.api.send_message(chat_id: message.chat.id, text: "You already participate on this dashboard! Please select another one.")
       end
