@@ -7,9 +7,9 @@ class CreateParticipationTable < ActiveRecord::Migration[6.0]
     create_table :participations do |table|
       table.integer :level
       table.boolean :active
-      table.timestamps
-      table.references :user, null: false, foreign_key: true
+      table.string :user_id, null: false
       table.references :dashboard, null: false, foreign_key: true
+      table.timestamps
     end
   end
 end

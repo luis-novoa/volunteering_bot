@@ -1,6 +1,8 @@
 require 'telegram/bot'
 require_relative('./values.rb')
 require_relative('../lib/controllers/bots_controllers.rb')
+require File.expand_path('../lib/models/participation', __dir__)
+require File.expand_path('../lib/models/dashboard', __dir__)
 
 token = @tkn_public
 puts @launch
@@ -41,6 +43,7 @@ Telegram::Bot::Client.run(token) do |bot|
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
+      user_participations = Participation.where(id: @identity)
     
     # Section 3 Volunteering
     when "#{@sec3}"
@@ -101,6 +104,9 @@ Telegram::Bot::Client.run(token) do |bot|
       # Here we have the type of board stored in the variable @length and the amount in @size
       # It should be able to create a new instance for that user based on those two parameters
       # aditionally, the user's unique id is found in @identity
+      dashboard = Dashboard.find_by(type: @length, entrance_fee: @size)
+      dashboard.participations.build(user_id: @identity, level: 1, active: false)
+      dashboard.save
 
     when "#{@item_5_2}"
       question = @item_5_2_text
