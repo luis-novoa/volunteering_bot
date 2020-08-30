@@ -5,7 +5,7 @@ connect_to_db
 class CreateDashboardTable < ActiveRecord::Migration[6.0]
   def change
     create_table :dashboards do |table|
-      table.string :type
+      table.string :dashboard_type
       table.integer :entrance_fee
       table.timestamps
     end
