@@ -1,6 +1,8 @@
 require 'telegram/bot'
 require_relative('./values.rb')
 require_relative('../lib/controllers/bots_controllers.rb')
+require File.expand_path('../lib/controllers/users_controller', __dir__)
+require File.expand_path('../lib/controllers/dashboards_controller', __dir__)
 
 token = @tkn_public
 puts @launch

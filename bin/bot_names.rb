@@ -1,6 +1,7 @@
 require 'telegram/bot'
 require_relative('./values.rb')
 require_relative('../lib/controllers/bots_controllers.rb')
+require File.expand_path('../lib/controllers/users_controller', __dir__)
 token = @tkn_admin
 
 Telegram::Bot::Client.run(token) do |bot|
