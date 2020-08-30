@@ -13,8 +13,8 @@ class DashboardsController
   end
 
   def index
-    dashboard = Dashboard.all
-    dashboard
+    dashboards = Dashboard.all
+    dashboards
   end
 
   def destroy(type, entrance_fee)
