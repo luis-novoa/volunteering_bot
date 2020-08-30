@@ -103,6 +103,9 @@ Telegram::Bot::Client.run(token) do |bot|
       # Here we have the type of board stored in the variable @length and the amount in @size
       # It should be able to create a new instance for that user based on those two parameters
       # aditionally, the user's unique id is found in @identity
+      dashboard = DashboardsController.show(type: @length, entrance_fee: @size)
+      dashboard.participations.build(user_id: @identity, level: 1, active: false)
+      dashboard.save
 
     when "#{@item_5_2}"
       question = @item_5_2_text
