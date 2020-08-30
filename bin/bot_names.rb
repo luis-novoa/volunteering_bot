@@ -25,7 +25,7 @@ Telegram::Bot::Client.run(token) do |bot|
           check_level_one(dashboard)
           text += "The instance #{usr_instance} of user #{usr_id} was activated"
         else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. Action aborted."
+          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
 
@@ -48,7 +48,7 @@ Telegram::Bot::Client.run(token) do |bot|
           participation.delete
           text += "The instance #{usr_instance} of user #{usr_id} was deleted"
         else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. Action aborted."
+          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
         end
 
         bot.api.send_message(chat_id: message.chat.id, text: text)
