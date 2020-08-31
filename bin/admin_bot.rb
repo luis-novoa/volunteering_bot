@@ -34,7 +34,7 @@ def check_level_one(dashboard)
     end
   end
   participation = Participation.where(level: 5).last
-  text += "User #{participation.user_id} needs to be paid for participation #{participation.id} on a #{participation.dashboard.type} (entrance fee: #{participation.dashboard.entrance_fee})  \n"
+  text += "User #{participation.user_id} needs to be paid for participation #{participation.id} on a #{participation.dashboard.dashboard_type} dashboard (entrance fee: #{participation.dashboard.entrance_fee})  \n"
   return text
 end
 
@@ -50,52 +50,64 @@ Telegram::Bot::Client.run(token) do |bot|
         # Activates a pending instance for an user and gives a confirmation message 
         usr_id = BotControllers.splitter(message.text)[1]
         usr_instance = BotControllers.splitter(message.text)[2]
-        participation = Participation.find(usr_instance)
-        dashboard = Dashboard.find(participation.dashboard_id)
-        text = ''
-        if participation.user_id == usr_id
-          participation.update(active: true)
-          text += "The instance #{usr_instance} of user #{usr_id} was activated \n"
-          text += check_level_one(dashboard)
-        else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
+        begin
+          participation = Participation.find(usr_instance)
+          dashboard = Dashboard.find(participation.dashboard_id)
+          text = ''
+          if participation.user_id == usr_id
+            participation.update(active: true)
+            text += "The instance #{usr_instance} of user #{usr_id} was activated \n"
+            text += check_level_one(dashboard)
+          else
+            text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
+          end
+          bot.api.send_message(chat_id: message.chat.id, text: text)
+        rescue => error
+          bot.api.send_message(chat_id: message.chat.id, text: error.message)
         end
-        bot.api.send_message(chat_id: message.chat.id, text: text)
+
 
       when /close\s\d{9}\s\d{1,3}/
         # Closes an instance for an user, creates a new lvl 1 active instance for the same kind of board and amount and gives a confirmation message 
         usr_id = BotControllers.splitter(message.text)[1]
         usr_instance = BotControllers.splitter(message.text)[2]
-        participation = Participation.find(usr_instance)
-        text = ''
-        if participation.user_id == usr_id
-          if participation.level == 5
-            participation.update(active: false)
-            renewed_participation = Participation.create(user_id: usr_id, dashboard_id: participation.dashboard_id, level: 1, active: true)
-            text += "The instance #{usr_instance} of user #{usr_id} has been closed and the instance #{renewed_participation.id} has been created"
+        begin
+          participation = Participation.find(usr_instance)
+          text = ''
+          if participation.user_id == usr_id
+            if participation.level == 5
+              participation.update(active: false)
+              renewed_participation = Participation.create(user_id: usr_id, dashboard_id: participation.dashboard_id, level: 1, active: true)
+              text += "The instance #{usr_instance} of user #{usr_id} has been closed and the instance #{renewed_participation.id} has been created"
+            else
+              text += "The level of instance #{usr_instance} is too low. \nAction aborted."
+            end
           else
-            text += "The level of instance #{usr_instance} is too low. \nAction aborted."
+            text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
           end
-        else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
+          bot.api.send_message(chat_id: message.chat.id, text: text)
+        rescue => error
+          bot.api.send_message(chat_id: message.chat.id, text: error.message)
         end
-
-        bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /delete\s\d{9}\s\d{1,3}/
         # Deletes a pending instance for an user and gives a confirmation message 
         usr_id = BotControllers.splitter(message.text)[1]
         usr_instance = BotControllers.splitter(message.text)[2]
-        participation = Participation.find(usr_instance)
-        text = ''
-        if participation.user_id == usr_id
-          participation.delete
-          text += "The instance #{usr_instance} of user #{usr_id} was deleted"
-        else
-          text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
-        end
+        begin
+          participation = Participation.find(usr_instance)
+          text = ''
+          if participation.user_id == usr_id
+            participation.delete
+            text += "The instance #{usr_instance} of user #{usr_id} was deleted"
+          else
+            text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
+          end
 
-        bot.api.send_message(chat_id: message.chat.id, text: text)
+          bot.api.send_message(chat_id: message.chat.id, text: text)
+        rescue => error
+          bot.api.send_message(chat_id: message.chat.id, text: error.message)
+        end
 
       when /check\sall/
         # Shows all the instances for all the users
@@ -157,12 +169,20 @@ Telegram::Bot::Client.run(token) do |bot|
       when /check\spending\s(long|short|all)/
         # Shows all the instances pending to be activated
         board_status = BotControllers.splitter(message.text)[2]
-        participations = Participation.where(active: false)
-        participations = participations.joins(:dashboard).where(dashboard: { type: board_status }) unless board_status == 'all'
-        participations = participations.order(user_id: :asc)
+        participations = Participation.where(active: false).includes(:dashboard).order(user_id: :asc)
         text = "Pending participations: \n"
-        participations.each do |participation|
-          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee} \n" if participation.level == 1 && !participation.active
+        if board_status == "long"
+          participations.each do |participation|
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}, Type: #{participation.dashboard.dashboard_type} \n" if participation.level == 1 && !participation.active && participation.dashboard.dashboard_type == "long"
+          end
+        elsif board_status == "short"
+          participations.each do |participation|
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}, Type: #{participation.dashboard.dashboard_type} \n" if participation.level == 1 && !participation.active && participation.dashboard.dashboard_type == "short"
+          end
+        else
+          participations.each do |participation|
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}, Type: #{participation.dashboard.dashboard_type} \n" if participation.level == 1 && !participation.active
+          end
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
 

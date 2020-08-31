@@ -114,9 +114,13 @@ Telegram::Bot::Client.run(token) do |bot|
       # It should be able to create a new instance for that user based on those two parameters
       # aditionally, the user's unique id is found in @identity
       dashboard = Dashboard.find_by(dashboard_type: @length, entrance_fee: @size)
-      participation = dashboard.participations.build(user_id: @identity, level: 1, active: false)
-      participation.save
-      bot.api.send_message(chat_id: message.chat.id, text: "Participation request #{participation.id} was created. Please, pay the fee and notify the administrator.")
+      begin
+        participation = dashboard.participations.build(user_id: @identity, level: 1, active: false)
+        participation.save
+        bot.api.send_message(chat_id: message.chat.id, text: "Participation request #{participation.id} was created. Please, pay the fee and notify the administrator.")
+      rescue => error
+        bot.api.send_message(chat_id: message.chat.id, text: error.message)
+      end
 
     when "#{@item_5_2}"
       question = @item_5_2_text
