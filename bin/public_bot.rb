@@ -29,6 +29,8 @@ Telegram::Bot::Client.run(token) do |bot|
     # Section 1 Rules
     when "#{@sec1}"
       question = @sec1_text
+      bot.api.send_photo(chat_id: message.from.id, photo: "#{@image1}")
+      bot.api.send_photo(chat_id: message.from.id, photo: "#{@image2}")
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
