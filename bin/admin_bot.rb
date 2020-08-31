@@ -5,6 +5,39 @@ require File.expand_path('../lib/models/participation', __dir__)
 require File.expand_path('../lib/models/dashboard', __dir__)
 token = @tkn_admin
 
+def check_level_one(dashboard)
+  participations = dashboard.participations.where(active: true)
+  level_one = participations.where(level: 1).select('min(id) as id').group(:user_id, :id)
+  text = ''
+  puts level_one
+  if dashboard.dashboard_type == 'long'
+    if level_one.size >= 8
+      level_one.limit(8)
+      level_two = participations.where(level: 2).select('min(id) as id').group(:user_id, :id).limit(4)
+      level_three = participations.where(level: 3).select('min(id) as id').group(:user_id, :id).limit(2)
+      level_four = participations.where(level: 4).select('min(id) as id').group(:user_id, :id).limit(1)
+      level_three.update_all(level: 4)
+      level_two.update_all(level: 3)
+      level_one.update_all(level: 2)
+      puts level_four
+      level_four.update_all(level: 5) unless level_four.empty?
+    end
+  else
+    if level_one.size >= 4
+      level_one.limit(4)
+      level_two = participations.where(level: 2).select('min(id) as id').group(:user_id, :id).limit(2)
+      level_three = participations.where(level: 3).select('min(id) as id').group(:user_id, :id).limit(1)
+      level_two.update_all(level: 3)
+      level_one.update_all(level: 2)
+      puts level_three
+      level_three.update_all(level: 5) unless level_three.empty?
+    end
+  end
+  participation = Participation.where(level: 5).last
+  text += "User #{participation.user_id} needs to be paid for participation #{participation.id} on a #{participation.dashboard.type} (entrance fee: #{participation.dashboard.entrance_fee})  \n"
+  return text
+end
+
 Telegram::Bot::Client.run(token) do |bot|
   bot.listen do |message|
     case message.from.id.to_s
@@ -18,11 +51,11 @@ Telegram::Bot::Client.run(token) do |bot|
         usr_id = BotControllers.splitter(message.text)[1]
         usr_instance = BotControllers.splitter(message.text)[2]
         participation = Participation.find(usr_instance)
-        dashboard = Dashboard.find(participation.dashboard_id).includes(:participations)
+        dashboard = Dashboard.find(participation.dashboard_id)
         text = ''
         if participation.user_id == usr_id
           participation.update(active: true)
-          text += "The instance #{usr_instance} of user #{usr_id} was activated\n"
+          text += "The instance #{usr_instance} of user #{usr_id} was activated \n"
           text += check_level_one(dashboard)
         else
           text += "The instance #{usr_instance} doesn't belong to user #{usr_id}. \nAction aborted."
@@ -33,10 +66,10 @@ Telegram::Bot::Client.run(token) do |bot|
         # Closes an instance for an user, creates a new lvl 1 active instance for the same kind of board and amount and gives a confirmation message 
         usr_id = BotControllers.splitter(message.text)[1]
         usr_instance = BotControllers.splitter(message.text)[2]
-        participation = Participation.find(usr_instance).includes(:dashboard)
+        participation = Participation.find(usr_instance)
         text = ''
         if participation.user_id == usr_id
-          if (participation.level == 4 && participation.dashboard.dashboard_type == 'long') || (participation.level == 3 && participation.dashboard.dashboard_type == 'short')
+          if participation.level == 5
             participation.update(active: false)
             renewed_participation = Participation.create(user_id: usr_id, dashboard_id: participation.dashboard_id, level: 1, active: true)
             text += "The instance #{usr_instance} of user #{usr_id} has been closed and the instance #{renewed_participation.id} has been created"
@@ -67,9 +100,9 @@ Telegram::Bot::Client.run(token) do |bot|
       when /check\sall/
         # Shows all the instances for all the users
         participations = Participation.all.includes(:dashboard).order(user_id: :asc)
-        text = 'All participations:\n'
+        text = 'All participations: \n'
         participations.each do |participation|
-          text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{participation.dashboard.dashboard_type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
+          text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{participation.dashboard.dashboard_type}, Entrance Fee: #{participation.dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active} \n" unless participation.level == 5 && !participation.active
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
 
@@ -87,10 +120,10 @@ Telegram::Bot::Client.run(token) do |bot|
         # Shows all the instances for a type of board, either long or short
         board_type = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(dashboard_type: board_type).includes(:participations)
-        text = "Participations on #{board_type} dashboards:\n"
+        text = "Participations on #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n"
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active} \n"
           end
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
@@ -100,7 +133,7 @@ Telegram::Bot::Client.run(token) do |bot|
         board_type = 'long'
         board_level = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(dashboard_type: board_type).includes(:participations)
-        text = "Participations on level #{board_level} of #{board_type} dashboards:\n"
+        text = "Participations on level #{board_level} of #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
             text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n" if participation.level == board_level
@@ -113,10 +146,10 @@ Telegram::Bot::Client.run(token) do |bot|
         board_type = 'short'
         board_level = BotControllers.splitter(message.text)[2]
         dashboards = Dashboard.where(dashboard_type: board_type).includes(:participations)
-        text = "Participations on level #{board_level} of #{board_type} dashboards:\n"
+        text = "Participations on level #{board_level} of #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n" if participation.level == board_level
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active} \n" if participation.level == board_level
           end
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
@@ -124,19 +157,21 @@ Telegram::Bot::Client.run(token) do |bot|
       when /check\spending\s(long|short|all)/
         # Shows all the instances pending to be activated
         board_status = BotControllers.splitter(message.text)[2]
-        participations = Participation.where(active: false).order(user_id: :asc).includes(:dashboard)
-        text = "Pending participations:\n"
+        participations = Participation.where(active: false)
+        participations = participations.joins(:dashboard).where(dashboard: { type: board_status }) unless board_status == 'all'
+        participations = participations.order(user_id: :asc)
+        text = "Pending participations: \n"
         participations.each do |participation|
-          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}\n"
+          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee} \n" if participation.level == 1 && !participation.active
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
 
       when /check\sclosed/
         # Shows all the instances that have been closed
-        participations = Participation.where(active: false, level: 4).order(user_id: :asc).includes(:dashboard)
-        text = "Closed participations:\n"
+        participations = Participation.where(active: false, level: 5).order(user_id: :asc).includes(:dashboard)
+        text = "Closed participations: \n"
         participations.each do |participation|
-          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}, Type: #{participation.dashboard.dashboard_type}\n"
+          text += "User: #{participation.user_id}, Participation: #{participation.id}, Fee: #{participation.dashboard.entrance_fee}, Type: #{participation.dashboard.dashboard_type} \n"
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
 
@@ -149,34 +184,3 @@ Telegram::Bot::Client.run(token) do |bot|
   end
 end
 
-def check_level_one(dashboard)
-  participations = dashboard.participations.where(active: true).order(created_at: :desc)
-  level_one = participations.where(level: 1)
-  text = ''
-  if dashboard.dashboard_type == 'long'
-    if level_one.size == 8
-      level_one.lock
-      level_two = participations.where(level: 2).first(4).lock
-      level_three = participations.where(level: 3).first(2).lock
-      level_three.update_all(level: 4)
-      level_two.update_all(level: 3)
-      level_one.update_all(level: 2)
-      text += "The following users need to be paid:\n"
-      level_three.each do |participation|
-        text += "User: #{participation.user_id}, Participation: #{participation.id}\n"
-      end
-    end
-  else
-    if level_one.size == 4
-      level_one.lock
-      level_two = participations.where(level: 2).first(2).lock
-      level_two.update_all(level: 3)
-      level_one.update_all(level: 2)
-      text += "The following users need to be paid:\n"
-      level_two.each do |participation|
-        text += "User: #{participation.user_id}, Participation: #{participation.id}\n"
-      end
-    end
-  end
-  text
-end
