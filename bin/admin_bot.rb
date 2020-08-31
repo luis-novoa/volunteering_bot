@@ -135,7 +135,7 @@ Telegram::Bot::Client.run(token) do |bot|
         text = "Participations on #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
-            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active} \n"
+            text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active} \n" unless participation.level == 5
           end
         end
         bot.api.send_message(chat_id: message.chat.id, text: text)
@@ -143,11 +143,12 @@ Telegram::Bot::Client.run(token) do |bot|
       when /check\slong\s(1|2|3|4)/
         # Shows all the instances of for long boards for a specific level from 1 to 4
         board_type = 'long'
-        board_level = BotControllers.splitter(message.text)[2]
+        board_level = BotControllers.splitter(message.text)[2].to_i
         dashboards = Dashboard.where(dashboard_type: board_type).includes(:participations)
         text = "Participations on level #{board_level} of #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
           dashboard.participations.each do |participation|
+            # puts [participation.level, board_level]
             text += "User: #{participation.user_id}, Participation: #{participation.id}, Type: #{dashboard.dashboard_type}, Entrance Fee: #{dashboard.entrance_fee}, Level: #{participation.level}, Active: #{participation.active}\n" if participation.level == board_level
           end
         end
@@ -156,7 +157,7 @@ Telegram::Bot::Client.run(token) do |bot|
       when /check\sshort\s(1|2|3)/
         # Shows all the instances of for short boards for a specific level from 1 to 3
         board_type = 'short'
-        board_level = BotControllers.splitter(message.text)[2]
+        board_level = BotControllers.splitter(message.text)[2].to_i
         dashboards = Dashboard.where(dashboard_type: board_type).includes(:participations)
         text = "Participations on level #{board_level} of #{board_type} dashboards: \n"
         dashboards.each do |dashboard|
