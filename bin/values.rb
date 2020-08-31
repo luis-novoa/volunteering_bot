@@ -72,7 +72,7 @@
   @sec6 = 'Help'
 
   # Section 6 text
-  @sec6_text = 'Instructions to get help'
+  @sec6_text = 'The administrator has been notified about your help request and will get in touch as soon as posible. \n If your account does not have an username, please contact the administrator directly'
   
   # Keyboard Variables
   @home = 'Home'

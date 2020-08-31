@@ -127,12 +127,12 @@ Telegram::Bot::Client.run(token) do |bot|
 
     # Section 6
     when "#{@sec6}"
+      bot.api.send_message(chat_id: @admin_id, text: "@#{message.from.username} requested help")
       question = @sec6_text
       answers =
         Telegram::Bot::Types::ReplyKeyboardMarkup
         .new(keyboard: @kb_home, one_time_keyboard: true)
       bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: answers)
-
     # Stops the Bot and says goodbye
     when "#{@end}"
       kb = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
