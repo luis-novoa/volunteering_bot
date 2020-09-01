@@ -3,9 +3,9 @@
 @tkn_admin = '1278753390:AAELNXnvVgPAJ0fhBWrD0tupkrut0nXHxFI'
 @admin_id = '748866554'
 
-@verb = 'volunteer'
-@verbing = 'volunteering'
-@pasted = "volunteered"
+@verb = 'bless'
+@verbing = 'blessing'
+@pasted = "blessed"
 @image1 = 'https://i.ibb.co/KKJm82J/bot1.jpg'
 @image2 = 'https://i.ibb.co/Jm4Mwyb/bot2.jpg'
 
