@@ -1,6 +1,6 @@
 # The Telegram bot's token goes here, replace 'token' for your token, keep the quotation marks as in 'your-token-goes-here'
-@tkn_public = '877177203:AAE5tNPbYDt62BTzlWxG02FzYhe6uqQHu88'
-@tkn_admin = '1118059983:AAHGhd2BhPa78F_zaw0BbSrWceBqVHfILPE'
+@tkn_public = '1161097322:AAFlq2mp28tZT4nxjF6UNsVCj3umLm74c34'
+@tkn_admin = '1278753390:AAELNXnvVgPAJ0fhBWrD0tupkrut0nXHxFI'
 @admin_id = '748866554'
 
 @verb = 'volunteer'
